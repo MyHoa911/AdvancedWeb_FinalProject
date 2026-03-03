@@ -1,0 +1,127 @@
+<div class="find-room" [formGroup]="filterForm">
+  <!-- Page Header -->
+  <div class="find-room__header">
+    <h1 class="find-room__title">Available Learning Spaces</h1>
+    <p class="find-room__subtitle">Find and reserve the perfect room for your study group or meeting.</p>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="find-room__filter-bar">
+    <!-- Search -->
+    <div class="filter-field filter-field--search">
+      <label class="filter-label">Search</label>
+      <div class="filter-input-wrap">
+        <mat-icon class="filter-icon">search</mat-icon>
+        <input
+          type="text"
+          class="filter-input"
+          placeholder="Search rooms, areas..."
+          formControlName="search"
+        />
+      </div>
+    </div>
+
+    <!-- Date -->
+    <div class="filter-field">
+      <label class="filter-label">Date</label>
+      <div class="filter-input-wrap filter-input-wrap--date">
+        <mat-icon class="filter-icon">calendar_today</mat-icon>
+        <input type="date" class="filter-input" formControlName="date" />
+      </div>
+    </div>
+
+    <!-- Time Range -->
+    <div class="filter-field">
+      <label class="filter-label">Time Range</label>
+      <div class="filter-select-wrap">
+        <mat-icon class="filter-icon">schedule</mat-icon>
+        <select class="filter-select" formControlName="timeSlot">
+          <option *ngFor="let slot of timeSlots" [value]="slot.label">{{ slot.label }}</option>
+        </select>
+        <mat-icon class="filter-chevron">expand_more</mat-icon>
+      </div>
+    </div>
+
+    <!-- Capacity -->
+    <div class="filter-field">
+      <label class="filter-label">Capacity</label>
+      <div class="filter-select-wrap">
+        <mat-icon class="filter-icon">group</mat-icon>
+        <select class="filter-select" formControlName="capacityMin">
+          <option [ngValue]="null">Any Capacity</option>
+          <option *ngFor="let opt of capacityOptions.slice(1)" [ngValue]="opt.value">{{ opt.label }}</option>
+        </select>
+        <mat-icon class="filter-chevron">expand_more</mat-icon>
+      </div>
+    </div>
+
+    <!-- Building -->
+    <div class="filter-field">
+      <label class="filter-label">Building</label>
+      <div class="filter-select-wrap">
+        <mat-icon class="filter-icon">location_on</mat-icon>
+        <select class="filter-select" formControlName="building">
+          <option value="">All Buildings</option>
+          <option *ngFor="let b of buildings" [value]="b">Tòa {{ b }}</option>
+        </select>
+        <mat-icon class="filter-chevron">expand_more</mat-icon>
+      </div>
+    </div>
+
+    <!-- Floor -->
+    <div class="filter-field">
+      <label class="filter-label">Floor</label>
+      <div class="filter-select-wrap">
+        <mat-icon class="filter-icon">stairs</mat-icon>
+        <select class="filter-select" formControlName="floor">
+          <option [ngValue]="null">All Floors</option>
+          <option *ngFor="let f of floorOptions" [ngValue]="f">Floor {{ f }}</option>
+        </select>
+        <mat-icon class="filter-chevron">expand_more</mat-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Message -->
+  <div
+    *ngIf="bookingMessage"
+    class="find-room__alert"
+    [ngClass]="{
+      'find-room__alert--success': bookingMessage.type === 'success',
+      'find-room__alert--error':   bookingMessage.type === 'error'
+    }"
+  >
+    <mat-icon>{{ bookingMessage.type === 'success' ? 'check_circle' : 'error_outline' }}</mat-icon>
+    <span>{{ bookingMessage.text }}</span>
+  </div>
+
+  <!-- Results info -->
+  <div class="find-room__results-info" *ngIf="!isLoading">
+    <span class="find-room__count">{{ rooms.length }} room{{ rooms.length !== 1 ? 's' : '' }} found</span>
+    <button class="find-room__clear-btn" type="button" (click)="clearFilters()">
+      <mat-icon>refresh</mat-icon> Clear filters
+    </button>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="find-room__loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading rooms...</p>
+  </div>
+
+  <!-- Room Grid -->
+  <div class="find-room__grid" *ngIf="!isLoading && rooms.length > 0">
+    <app-room-card
+      *ngFor="let room of rooms"
+      [room]="room"
+      (bookClicked)="book(room)"
+    ></app-room-card>
+  </div>
+
+  <!-- Empty State -->
+  <div class="find-room__empty" *ngIf="!isLoading && rooms.length === 0">
+    <mat-icon class="find-room__empty-icon">search_off</mat-icon>
+    <h3>No rooms found</h3>
+    <p>Try adjusting your filters or <button class="link-btn" type="button" (click)="clearFilters()">clear all filters</button>.</p>
+  </div>
+</div>

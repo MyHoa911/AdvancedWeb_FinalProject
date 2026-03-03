@@ -2,6 +2,7 @@ import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 
 import { AppRoutingModule } from './app-routing-module';
@@ -23,6 +24,9 @@ import { PrivacyPolicyComponent } from './features/privacy-policy/privacy-policy
 import { TermsOfUseComponent } from './features/terms-of-use/terms-of-use.component';
 import { ContactSupportComponent } from './features/contact-support/contact-support.component';
 
+// Shared components
+import { RoomCardComponent } from './shared/components/room-card/room-card.component';
+
 @NgModule({
   declarations: [
     App,
@@ -38,11 +42,14 @@ import { ContactSupportComponent } from './features/contact-support/contact-supp
     PrivacyPolicyComponent,
     TermsOfUseComponent,
     ContactSupportComponent,
+    RoomCardComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    ReactiveFormsModule,
+    FormsModule,
     MatIconModule,
     AppRoutingModule,
   ],

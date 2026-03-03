@@ -1,0 +1,46 @@
+<div class="room-card">
+  <!-- Image -->
+  <div class="room-card__image-wrap">
+    <img [src]="room.image" [alt]="room.name" class="room-card__image" loading="lazy" />
+    <span
+      class="room-card__badge"
+      [ngClass]="{
+        'room-card__badge--available': room.status === 'AVAILABLE',
+        'room-card__badge--booked': room.status === 'BOOKED'
+      }"
+    >{{ room.status === 'AVAILABLE' ? 'Available' : 'Booked' }}</span>
+  </div>
+
+  <!-- Content -->
+  <div class="room-card__body">
+    <!-- Header: Name + Capacity -->
+    <div class="room-card__header">
+      <h3 class="room-card__name">{{ room.name }}</h3>
+      <div class="room-card__capacity">
+        <mat-icon class="room-card__capacity-icon">group</mat-icon>
+        <span>{{ room.capacity }}</span>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <p class="room-card__location">Tòa {{ room.building }}, Tầng {{ room.floor }}</p>
+
+    <!-- Equipment tags -->
+    <div class="room-card__equipment">
+      <span class="room-card__eq-tag" *ngFor="let eq of room.equipment">
+        <mat-icon class="room-card__eq-icon">{{ getEquipmentIcon(eq) }}</mat-icon>
+        {{ eq }}
+      </span>
+    </div>
+
+    <!-- Book button -->
+    <button
+      class="room-card__btn"
+      [ngClass]="{ 'room-card__btn--disabled': room.status === 'BOOKED' }"
+      [disabled]="room.status === 'BOOKED'"
+      (click)="bookClicked.emit()"
+    >
+      {{ room.status === 'AVAILABLE' ? 'Book Now' : 'Unavailable' }}
+    </button>
+  </div>
+</div>
