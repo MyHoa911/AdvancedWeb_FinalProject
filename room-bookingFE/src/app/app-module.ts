@@ -3,6 +3,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
@@ -45,6 +47,8 @@ import { ContactSupportComponent } from './features/contact-support/contact-supp
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    CommonModule,
+    ReactiveFormsModule,
     MatIconModule,
     AppRoutingModule,
   ],
