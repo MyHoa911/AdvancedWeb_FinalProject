@@ -1,0 +1,285 @@
+<!-- ── Toast ─────────────────────────────────────────────────────────────── -->
+<div
+  *ngIf="toast"
+  class="fixed top-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold transition-all"
+  [ngClass]="{
+    'bg-[#dcfce7] text-[#15803d] border border-[#bbf7d0]': toast.type === 'success',
+    'bg-[#fee2e2] text-[#b91c1c] border border-[#fecaca]': toast.type === 'error'
+  }"
+>
+  <mat-icon class="text-[18px]">{{ toast.type === 'success' ? 'check_circle' : 'error' }}</mat-icon>
+  <span>{{ toast.message }}</span>
+  <button (click)="dismissToast()" class="ml-2 opacity-60 hover:opacity-100">
+    <mat-icon class="text-[16px]">close</mat-icon>
+  </button>
+</div>
+
+<!-- ── Page wrapper ──────────────────────────────────────────────────────── -->
+<div class="flex flex-col min-h-full w-full">
+
+  <!-- ── Centered content (header card + body columns share the same container) -->
+  <div class="px-6 py-8 max-w-5xl w-full mx-auto flex flex-col gap-6">
+
+    <!-- ── Avatar / header card ──────────────────────────────────────── -->
+    <div class="bg-white rounded-xl border border-[#e2e8f0] shadow-sm p-6 w-full">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full">
+
+        <!-- Avatar + name -->
+        <div class="flex flex-row gap-6 items-center">
+
+          <!-- Avatar container -->
+          <div class="relative shrink-0">
+            <div
+              class="bg-[#e2e8f0] rounded-2xl border-4 border-white w-24 h-24 overflow-hidden"
+              style="box-shadow: 0px 8px 10px -6px rgba(0,0,0,.1), 0px 20px 25px -5px rgba(0,0,0,.1)"
+            >
+              <img
+                [src]="avatarPreview"
+                alt="Avatar"
+                class="w-full h-full object-cover"
+                (error)="avatarPreview = 'https://i.pravatar.cc/150?img=0'"
+              />
+            </div>
+            <!-- Camera button -->
+            <label
+              class="absolute -right-2 -bottom-2 bg-[#257bf4] rounded-lg p-2 flex items-center justify-center cursor-pointer"
+              style="box-shadow: 0px 4px 6px -4px rgba(0,0,0,.1), 0px 10px 15px -3px rgba(0,0,0,.1)"
+              title="Upload avatar"
+            >
+              <input type="file" accept="image/*" class="hidden" (change)="onFileChange($event)" />
+              <mat-icon class="text-white text-[18px] w-[18px] h-[18px] leading-[18px]">photo_camera</mat-icon>
+            </label>
+          </div>
+
+          <!-- Name + sub -->
+          <div class="flex flex-col gap-1">
+            <div class="flex flex-row flex-wrap gap-3 items-center">{{ profile?.fullName ?? user?.email ?? '—' }}</span>
+              <span class="bg-[#dcfce7] border border-[#bbf7d0] rounded-full px-2 py-1 text-[#15803d] font-bold text-xs leading-4">Active</span>
+            </div>
+            <div class="flex flex-row gap-2 items-center">
+              <mat-icon class="text-[#64748b] text-[18px] w-[18px] h-[18px] leading-[18px]">school</mat-icon>
+              <span class="text-[#64748b] text-base leading-6">
+                {{ profile?.major ?? '—' }} • ID: {{ profile?.studentCode ?? '—' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex flex-row gap-3 sm:shrink-0">
+          <button
+            type="button"
+            (click)="onCancelInfo()"
+            class="rounded-lg border border-[#e2e8f0] px-4 py-2 text-[#0f172a] font-semibold text-sm leading-5"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            (click)="onSaveInfo()"
+            [disabled]="savingInfo"
+            class="relative bg-[#257bf4] rounded-lg px-6 py-[9px] text-white font-semibold text-sm leading-5 disabled:opacity-60"
+            style="box-shadow: 0px 4px 6px -4px rgba(37,123,244,.2), 0px 10px 15px -3px rgba(37,123,244,.2)"
+          >
+            {{ savingInfo ? 'Saving…' : 'Save Changes' }}
+          </button>
+        </div>
+      </div>
+    </div><!-- /header card -->
+
+    <!-- ── Body columns ─────────────────────────────────────────────── -->
+    <div class="flex flex-col lg:flex-row gap-6 items-start">
+
+      <!-- ── Left column ─────────────────────────────────────────────── -->
+      <div class="flex flex-col gap-6 flex-1 min-w-0">
+
+        <!-- Personal Information card -->
+        <div class="bg-white rounded-xl border border-[#e2e8f0] p-6 flex flex-col gap-6 shadow-sm">
+          <span class="text-[#0f172a] font-bold text-lg leading-7">Personal Information</span>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+
+            <!-- Full Name (readonly) -->
+            <div class="flex flex-col gap-[6.5px]">
+              <label class="text-[#64748b] font-bold text-xs uppercase tracking-[0.6px]">Full Name</label>
+              <div class="bg-[#f8fafc] rounded-lg border border-[#e2e8f0] px-4 py-2.5 opacity-75">
+                <span class="text-[#0f172a] text-base leading-6">{{ profile?.fullName ?? '—' }}</span>
+              </div>
+            </div>
+
+            <!-- Student Code (readonly) -->
+            <div class="flex flex-col gap-[6.5px]">
+              <label class="text-[#64748b] font-bold text-xs uppercase tracking-[0.6px]">Student Code</label>
+              <div class="bg-[#f8fafc] rounded-lg border border-[#e2e8f0] px-4 py-2.5 opacity-75">
+                <span class="text-[#0f172a] text-base leading-6">{{ profile?.studentCode ?? '—' }}</span>
+              </div>
+            </div>
+
+            <!-- Phone (editable) -->
+            <div class="flex flex-col gap-[6.5px]" [formGroup]="infoForm">
+              <label class="text-[#64748b] font-bold text-xs uppercase tracking-[0.6px]">Phone Number</label>
+              <input
+                formControlName="phone"
+                type="tel"
+                placeholder="+84 xxx xxx xxxx"
+                class="bg-[#f8fafc] rounded-lg border px-4 py-2.5 text-[#0f172a] text-base leading-6 outline-none focus:ring-2 focus:ring-[#257bf4] transition"
+                [ngClass]="{ 'border-red-400': f['phone'].invalid && f['phone'].touched, 'border-[#e2e8f0]': !(f['phone'].invalid && f['phone'].touched) }"
+              />
+              <span *ngIf="f['phone'].invalid && f['phone'].touched" class="text-red-500 text-xs">Phone is required.</span>
+            </div>
+
+            <!-- Faculty (readonly) -->
+            <div class="flex flex-col gap-[6.5px]">
+              <label class="text-[#64748b] font-bold text-xs uppercase tracking-[0.6px]">Faculty</label>
+              <div class="bg-[#f8fafc] rounded-lg border border-[#e2e8f0] px-4 py-2.5 opacity-75">
+                <span class="text-[#0f172a] text-base leading-6">{{ profile?.faculty ?? '—' }}</span>
+              </div>
+            </div>
+
+            <!-- Major (readonly) -->
+            <div class="flex flex-col gap-[6.5px]">
+              <label class="text-[#64748b] font-bold text-xs uppercase tracking-[0.6px]">Major</label>
+              <div class="bg-[#f8fafc] rounded-lg border border-[#e2e8f0] px-4 py-2.5 opacity-75">
+                <span class="text-[#0f172a] text-base leading-6">{{ profile?.major ?? '—' }}</span>
+              </div>
+            </div>
+
+            <!-- Joined Date (readonly) -->
+            <div class="flex flex-col gap-[6.5px]">
+              <label class="text-[#64748b] font-bold text-xs uppercase tracking-[0.6px]">Joined Date</label>
+              <div class="bg-[#f8fafc] rounded-lg border border-[#e2e8f0] px-4 py-2.5 opacity-75">
+                <span class="text-[#0f172a] text-base leading-6">{{ joinedDate }}</span>
+              </div>
+            </div>
+
+            <!-- Weekly Quota (readonly – full width) -->
+            <div class="col-span-2 flex flex-col gap-[6.5px]">
+              <label class="text-[#64748b] font-bold text-xs uppercase tracking-[0.6px]">Weekly Booking Quota</label>
+              <div class="bg-[#f8fafc] rounded-lg border border-[#e2e8f0] px-4 py-2.5 flex flex-row gap-3 items-center">
+                <mat-icon class="text-[#257bf4] text-[20px] w-[20px] h-[20px] leading-[20px]">schedule</mat-icon>
+                <span class="text-[#0f172a] font-semibold text-base leading-6">
+                  {{ profile?.quotaPerWeek ?? 0 }} bookings per week
+                </span>
+                <span class="text-[#94a3b8] text-xs leading-4 ml-auto">Booking limit assigned on registration</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Security Settings card -->
+        <div class="bg-white rounded-xl border border-[#e2e8f0] p-6 flex flex-col gap-6 shadow-sm">
+          <div class="flex flex-row items-center justify-between">
+            <span class="text-[#0f172a] font-bold text-lg leading-7">Security Settings</span>
+            <span class="text-[#94a3b8] text-xs leading-4">Last changed: 3 months ago</span>
+          </div>
+
+          <form [formGroup]="passwordForm" class="flex flex-col gap-4">
+
+            <!-- Current Password -->
+            <div class="flex flex-col gap-[6.5px]">
+              <label class="text-[#64748b] font-bold text-xs uppercase tracking-[0.6px]">Current Password</label>
+              <input
+                formControlName="currentPassword"
+                type="password"
+                placeholder="••••••••••••"
+                class="bg-[#f8fafc] rounded-lg border px-4 py-3 text-[#0f172a] text-base outline-none focus:ring-2 focus:ring-[#257bf4] transition"
+                [ngClass]="{ 'border-red-400': p['currentPassword'].invalid && p['currentPassword'].touched, 'border-[#e2e8f0]': !(p['currentPassword'].invalid && p['currentPassword'].touched) }"
+              />
+              <span *ngIf="p['currentPassword'].invalid && p['currentPassword'].touched" class="text-red-500 text-xs">Current password is required.</span>
+            </div>
+
+            <!-- New + Confirm -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+              <div class="flex flex-col gap-[6.5px]">
+                <label class="text-[#64748b] font-bold text-xs uppercase tracking-[0.6px]">New Password</label>
+                <input
+                  formControlName="newPassword"
+                  type="password"
+                  placeholder="Enter new password"
+                  class="bg-[#f8fafc] rounded-lg border px-4 py-3 text-[#0f172a] text-base outline-none focus:ring-2 focus:ring-[#257bf4] transition"
+                  [ngClass]="{ 'border-red-400': p['newPassword'].invalid && p['newPassword'].touched, 'border-[#e2e8f0]': !(p['newPassword'].invalid && p['newPassword'].touched) }"
+                />
+                <span *ngIf="p['newPassword'].errors?.['required'] && p['newPassword'].touched" class="text-red-500 text-xs">New password is required.</span>
+                <span *ngIf="p['newPassword'].errors?.['minlength'] && p['newPassword'].touched" class="text-red-500 text-xs">Minimum 8 characters.</span>
+              </div>
+
+              <div class="flex flex-col gap-[6.5px]">
+                <label class="text-[#64748b] font-bold text-xs uppercase tracking-[0.6px]">Confirm New Password</label>
+                <input
+                  formControlName="confirmPassword"
+                  type="password"
+                  placeholder="Repeat new password"
+                  class="bg-[#f8fafc] rounded-lg border px-4 py-3 text-[#0f172a] text-base outline-none focus:ring-2 focus:ring-[#257bf4] transition"
+                  [ngClass]="{ 'border-red-400': p['confirmPassword'].invalid && p['confirmPassword'].touched, 'border-[#e2e8f0]': !(p['confirmPassword'].invalid && p['confirmPassword'].touched) }"
+                />
+                <span *ngIf="p['confirmPassword'].errors?.['required'] && p['confirmPassword'].touched" class="text-red-500 text-xs">Please confirm your password.</span>
+                <span *ngIf="p['confirmPassword'].errors?.['mismatch'] && p['confirmPassword'].touched" class="text-red-500 text-xs">Passwords do not match.</span>
+              </div>
+
+            </div>
+
+            <div class="flex justify-end">
+              <button
+                type="button"
+                (click)="onChangePassword()"
+                [disabled]="savingPassword"
+                class="bg-[#257bf4] rounded-lg px-6 py-[9px] text-white font-semibold text-sm leading-5 disabled:opacity-60"
+                style="box-shadow: 0px 4px 6px -4px rgba(37,123,244,.2), 0px 10px 15px -3px rgba(37,123,244,.2)"
+              >
+                {{ savingPassword ? 'Saving…' : 'Change Password' }}
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+
+      <!-- ── Right column ────────────────────────────────────────────── -->
+      <div class="flex flex-col gap-6 w-full lg:w-[304px] shrink-0">
+
+        <!-- Notification Preferences card -->
+        <div class="bg-white rounded-xl border border-[#e2e8f0] p-6 flex flex-col gap-4 shadow-sm">
+          <span class="text-[#0f172a] font-bold text-base leading-6">Notification Preferences</span>
+
+          <div class="flex flex-col gap-4">
+            <!-- Booking Confirmations toggle -->
+            <div class="flex flex-row items-center justify-between">
+              <span class="text-[#475569] text-sm leading-5">Booking Confirmations</span>
+              <div class="relative w-9 h-5">
+                <div class="bg-[#257bf4] rounded-full w-9 h-5"></div>
+                <div class="bg-white rounded-full w-4 h-4 absolute left-[18px] top-0.5"></div>
+              </div>
+            </div>
+            <!-- Course Updates toggle -->
+            <div class="flex flex-row items-center justify-between">
+              <span class="text-[#475569] text-sm leading-5">Course Updates</span>
+              <div class="relative w-9 h-5">
+                <div class="bg-[#257bf4] rounded-full w-9 h-5"></div>
+                <div class="bg-white rounded-full w-4 h-4 absolute left-[18px] top-0.5"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Need Help card -->
+        <div class="bg-[#f1f5f9] rounded-xl border border-dashed border-[#cbd5e1] p-6 flex flex-col gap-3">
+          <div class="flex flex-row gap-3 items-center">
+            <mat-icon class="text-[#257bf4] text-[20px] w-[20px] h-[20px] leading-[20px]">help_outline</mat-icon>
+            <span class="text-[#0f172a] font-bold text-sm leading-5">Need Help?</span>
+          </div>
+          <p class="text-[#64748b] text-xs leading-5">
+            If you're having trouble updating your details, please contact the Registrar's Office.
+          </p>
+          <a routerLink="/contact-support" class="flex flex-row gap-2 items-center pt-1">
+            <span class="text-[#0f172a] font-bold text-xs leading-4">Contact Support</span>
+            <mat-icon class="text-[#0f172a] text-[16px] w-[16px] h-[16px] leading-[16px]">arrow_forward</mat-icon>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

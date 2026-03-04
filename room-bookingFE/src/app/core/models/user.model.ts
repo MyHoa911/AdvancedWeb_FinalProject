@@ -15,6 +15,7 @@ export interface StudentProfile {
   phone: string;
   quotaPerWeek: number;
   avatarUrl: string;
+  createdAt?: string | Date;
 }
 
 export interface UserWithProfile {
