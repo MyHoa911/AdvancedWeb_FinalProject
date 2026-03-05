@@ -53,7 +53,8 @@
 
           <!-- Name + sub -->
           <div class="flex flex-col gap-1">
-            <div class="flex flex-row flex-wrap gap-3 items-center">{{ profile?.fullName ?? user?.email ?? '—' }}</span>
+            <div class="flex flex-row flex-wrap gap-3 items-center">
+              <span>{{ profile?.fullName ?? user?.email ?? '—' }}</span>
               <span class="bg-[#dcfce7] border border-[#bbf7d0] rounded-full px-2 py-1 text-[#15803d] font-bold text-xs leading-4">Active</span>
             </div>
             <div class="flex flex-row gap-2 items-center">
